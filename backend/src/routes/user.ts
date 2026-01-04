@@ -181,7 +181,7 @@ userRouter.post("/change-password", auth, async (req, res) => {
         });
     } catch (error: any) {
         res.status(500).json({
-            message: "Password change failed. Try again later.",
+            message: "Failed to change password. Try again later.",
         });
     }
 });

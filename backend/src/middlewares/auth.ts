@@ -15,7 +15,8 @@ interface AuthPayload extends JwtPayload {
 }
 
 const auth = (req: Request, res: Response, next: NextFunction) => {
-    const token = req.cookies?.token || req.headers.authorization?.replace("Bearer ","");
+    const token =
+        req.cookies?.token || req.headers.authorization?.replace("Bearer ", "");
 
     if (!token) {
         return res.status(401).json({
@@ -24,14 +25,14 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
     }
     try {
         const decoded = jwt.verify(token, JWT_SECRET) as AuthPayload;
-        if (decoded.userId) {
-            req.userId = decoded.userId;
-            next();
-        } else {
-            return res.status(401).json({
-                message: "Invalid or expired token",
-            });
+        if (!decoded.userId) {
+            return res
+                .status(401)
+                .json({ message: "Invalid or expired token" });
         }
+
+        req.userId = decoded.userId;
+        next();
     } catch (error) {
         return res.status(401).json({
             message: "Invalid or expired token",

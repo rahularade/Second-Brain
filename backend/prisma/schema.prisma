@@ -44,6 +44,9 @@ model Content {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([userId, link])
+  @@index([title])
 }
 
 model Tag {

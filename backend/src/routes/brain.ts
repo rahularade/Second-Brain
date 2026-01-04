@@ -52,8 +52,8 @@ brainRouter.post("/share", auth, async (req, res) => {
     }
 });
 
-brainRouter.get("/:shareLink", async (req, res) => {
-    const hash = req.params.shareLink;
+brainRouter.get("/:hash", async (req, res) => {
+    const hash = req.params.hash;
 
     try {
         const link = await prisma.shareLink.findUnique({

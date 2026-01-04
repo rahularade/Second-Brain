@@ -13,7 +13,12 @@ const contentSchema = z.object({
         .string()
         .toUpperCase()
         .pipe(z.enum(ContentType, "Invalid content type")),
-    tags: z.array(z.string("Invalid tag name").toLowerCase(), "Invalid tag name"),
+    tags: z
+        .array(
+            z.string("Invalid tag name").trim().min(3, "Invalid tag name").max(20, "Tag name too long").toLowerCase(),
+            "Invalid tag name"
+        )
+        .max(10, "Maximum 10 tags allowed"),
 });
 
 contentRouter.post("/", auth, async (req, res) => {
@@ -106,8 +111,8 @@ contentRouter.get("/", auth, async (req, res) => {
     }
 });
 
-contentRouter.delete("/", auth, async (req, res) => {
-    const parsedData = z.uuid().safeParse(req.body.contentId);
+contentRouter.delete("/:contentId", auth, async (req, res) => {
+    const parsedData = z.uuid().safeParse(req.params.contentId);
 
     if (!parsedData.success) {
         return res.status(400).json({

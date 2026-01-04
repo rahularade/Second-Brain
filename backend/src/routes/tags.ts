@@ -6,12 +6,12 @@ const tagRouter = Router();
 
 tagRouter.get("/", auth, async (req, res) => {
     try {
-        const filter = (req.query.filter as string).trim() || "";
+        const filter = typeof req.query.filter === "string" ? req.query.filter.trim() : "";
         const tags = await prisma.tag.findMany({
             where: {
                 title: {
-                    contains: filter,
-                    mode: "insensitive"
+                    contains: filter.trim(),
+                    mode: "insensitive",
                 },
             },
             select: {

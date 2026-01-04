@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { CookieOptions, Router } from "express";
 import z from "zod";
 import bcrypt from "bcrypt";
 import prisma from "../lib/prisma.js";
@@ -7,6 +7,8 @@ import { JWT_SECRET } from "../config.js";
 import auth from "../middlewares/auth.js";
 
 const userRouter = Router();
+
+const SALT_ROUNDS = 9;
 
 const passwordSchema = z
     .string()
@@ -29,9 +31,11 @@ const changePasswordSchema = z.object({
     newPassword: passwordSchema,
 });
 
-const options = {
+const options: CookieOptions = {
     httpOnly: true,
     secure: true,
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000
 };
 
 userRouter.post("/signup", async (req, res) => {
@@ -45,7 +49,7 @@ userRouter.post("/signup", async (req, res) => {
 
     const { email, password } = parsedData.data;
 
-    const hashedPassword = await bcrypt.hash(password, 9);
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
     try {
         const user = await prisma.user.create({
@@ -111,7 +115,7 @@ userRouter.post("/signin", async (req, res) => {
             expiresIn: "7d",
         });
 
-        res.status(201).cookie("token", token, options).json({
+        res.status(200).cookie("token", token, options).json({
             message: "Signed in successfully",
         });
     } catch (error: any) {
@@ -165,7 +169,7 @@ userRouter.post("/change-password", auth, async (req, res) => {
             });
         }
 
-        const hashedPassword = await bcrypt.hash(newPassword, 9);
+        const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
 
         await prisma.user.update({
             where: {
@@ -176,7 +180,11 @@ userRouter.post("/change-password", auth, async (req, res) => {
             },
         });
 
-        res.status(201).json({
+        const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
+            expiresIn: "7d",
+        });
+
+        res.status(200).cookie("token", token, options).json({
             message: "Password Changed successfully",
         });
     } catch (error: any) {
@@ -206,7 +214,35 @@ userRouter.get("/me", auth, async (req, res) => {
         res.status(200).json({
             user,
         });
-    } catch (error) {}
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to fetch user. Try again later.",
+        });
+    }
+});
+
+userRouter.delete("/me", auth, async (req, res) => {
+    try {
+        const result = await prisma.user.deleteMany({
+            where: {
+                id: req.userId!,
+            },
+        });
+
+        if (result.count === 0) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        res.status(200).clearCookie("token", options).json({
+            message: "User account deleted successfully"
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to delete account. Try again later.",
+        });
+    }
 });
 
 export default userRouter;

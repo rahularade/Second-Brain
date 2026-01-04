@@ -1,35 +1,14 @@
 import { CookieOptions, Router } from "express";
-import z from "zod";
 import bcrypt from "bcrypt";
 import prisma from "../lib/prisma.js";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config.js";
 import auth from "../middlewares/auth.js";
+import { changePasswordSchema, userSchema } from "../schemas/user.schema.js";
 
 const userRouter = Router();
 
 const SALT_ROUNDS = 9;
-
-const passwordSchema = z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .max(30, "Password must be less than 30 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/\d/, "Password must contain at least one number")
-    .regex(
-        /[^A-Za-z0-9]/,
-        "Password must contain at least one special character"
-    );
-
-const userSchema = z.object({
-    email: z.email("Invalid email address").trim().toLowerCase(),
-    password: passwordSchema,
-});
-
-const changePasswordSchema = z.object({
-    oldPassword: passwordSchema,
-    newPassword: passwordSchema,
-});
 
 const options: CookieOptions = {
     httpOnly: true,

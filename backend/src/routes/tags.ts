@@ -10,7 +10,7 @@ tagRouter.get("/", auth, async (req, res) => {
         const tags = await prisma.tag.findMany({
             where: {
                 title: {
-                    contains: filter.trim(),
+                    contains: filter,
                     mode: "insensitive",
                 },
             },

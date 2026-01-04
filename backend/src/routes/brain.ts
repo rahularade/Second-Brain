@@ -2,6 +2,8 @@ import { Router } from "express";
 import auth from "../middlewares/auth.js";
 import prisma from "../lib/prisma.js";
 import randomHash from "../utils/randomHash.js";
+import { ContentType } from "../generated/prisma/enums.js";
+import { parseContentQuery } from "../utils/parseQuery.js";
 
 const brainRouter = Router();
 
@@ -36,11 +38,16 @@ brainRouter.post("/share", auth, async (req, res) => {
         }
     } else {
         try {
-            await prisma.shareLink.delete({
+            const result = await prisma.shareLink.deleteMany({
                 where: {
                     userId,
                 },
             });
+            if (result.count === 0) {
+                return res
+                    .status(404)
+                    .json({ message: "No share link exists" });
+            }
             res.status(200).json({
                 message: "Sharelink deleted successfully",
             });
@@ -54,6 +61,7 @@ brainRouter.post("/share", auth, async (req, res) => {
 
 brainRouter.get("/:hash", async (req, res) => {
     const hash = req.params.hash;
+    const {search, type, page, limit, skip} = parseContentQuery(req.query)
 
     try {
         const link = await prisma.shareLink.findUnique({
@@ -68,10 +76,21 @@ brainRouter.get("/:hash", async (req, res) => {
             });
         }
 
+        const where: any = {
+            userId: link.userId,
+            ...(search && {
+                title: {
+                    contains: search,
+                    mode: "insensitive",
+                },
+            }),
+            ...(type !== "ALL" && {
+                type: type as ContentType,
+            }),
+        };
+
         const contents = await prisma.content.findMany({
-            where: {
-                userId: link.userId,
-            },
+            where,
             include: {
                 tags: {
                     select: {
@@ -82,9 +101,20 @@ brainRouter.get("/:hash", async (req, res) => {
             omit: {
                 userId: true,
             },
+            orderBy: {
+                createdAt: "desc",
+            },
+            skip,
+            take: limit,
         });
 
+        const total = await prisma.content.count({ where });
+
         res.status(200).json({
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
             contents: contents.map((c) => ({
                 ...c,
                 type: c.type.toLowerCase(),

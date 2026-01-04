@@ -3,23 +3,10 @@ import auth from "../middlewares/auth.js";
 import z from "zod";
 import { ContentType } from "../generated/prisma/enums.js";
 import prisma from "../lib/prisma.js";
+import { contentSchema } from "../schemas/content.schema.js";
+import { parseContentQuery } from "../utils/parseQuery.js";
 
 const contentRouter = Router();
-
-const contentSchema = z.object({
-    title: z.string().trim().min(3, "Title must be at least 3 characters"),
-    link: z.url("Invalid link"),
-    type: z
-        .string()
-        .toUpperCase()
-        .pipe(z.enum(ContentType, "Invalid content type")),
-    tags: z
-        .array(
-            z.string("Invalid tag name").trim().min(3, "Invalid tag name").max(20, "Tag name too long").toLowerCase(),
-            "Invalid tag name"
-        )
-        .max(10, "Maximum 10 tags allowed"),
-});
 
 contentRouter.post("/", auth, async (req, res) => {
     const parsedData = contentSchema.safeParse(req.body);
@@ -80,11 +67,22 @@ contentRouter.post("/", auth, async (req, res) => {
 contentRouter.get("/", auth, async (req, res) => {
     const userId = req.userId!;
 
+    const {search, type, page, limit, skip} = parseContentQuery(req.query)
+
+    const where: any = {
+        userId,
+        ...(search && {title: {
+            contains: search,
+            mode: "insensitive",
+        },}),
+        ...(type !== "ALL" && {
+            type: type as ContentType
+        })
+    };
+
     try {
         const contents = await prisma.content.findMany({
-            where: {
-                userId,
-            },
+            where,
             include: {
                 tags: {
                     select: {
@@ -95,9 +93,20 @@ contentRouter.get("/", auth, async (req, res) => {
             omit: {
                 userId: true,
             },
+            orderBy: {
+                createdAt: "desc",
+            },
+            skip,
+            take: limit,
         });
 
+        const total = await prisma.content.count({ where });
+
         res.status(200).json({
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total/limit),
             contents: contents.map((c) => ({
                 ...c,
                 type: c.type.toLowerCase(),

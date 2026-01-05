@@ -4,7 +4,7 @@ import prisma from "../lib/prisma.js";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config.js";
 import auth from "../middlewares/auth.js";
-import { changePasswordSchema, userSchema } from "../schemas/user.schema.js";
+import { changePasswordSchema, userSigninSchema, userSignupSchema, } from "../schemas/user.schema.js";
 
 const userRouter = Router();
 
@@ -18,7 +18,7 @@ const options: CookieOptions = {
 };
 
 userRouter.post("/signup", async (req, res) => {
-    const parsedData = userSchema.safeParse(req.body);
+    const parsedData = userSignupSchema.safeParse(req.body);
 
     if (!parsedData.success) {
         return res.status(400).json({
@@ -26,13 +26,14 @@ userRouter.post("/signup", async (req, res) => {
         });
     }
 
-    const { email, password } = parsedData.data;
+    const { name, email, password } = parsedData.data;
 
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
     try {
         const user = await prisma.user.create({
             data: {
+                name,
                 email,
                 password: hashedPassword,
             },
@@ -59,7 +60,7 @@ userRouter.post("/signup", async (req, res) => {
 });
 
 userRouter.post("/signin", async (req, res) => {
-    const parsedData = userSchema.safeParse(req.body);
+    const parsedData = userSigninSchema.safeParse(req.body);
 
     if (!parsedData.success) {
         return res.status(400).json({

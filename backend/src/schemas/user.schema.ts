@@ -11,10 +11,20 @@ const passwordSchema = z
         "Password must contain at least one special character"
     );
 
-export const userSchema = z.object({
+export const userSignupSchema = z.object({
+    name: z
+    .string("Name is required")
+    .trim()
+    .min(3, "Name must be at least 3 characters")
+    .max(30, "Name must be less than 30 characters"),
     email: z.email("Invalid email address").trim().toLowerCase(),
     password: passwordSchema,
 });
+
+export const userSigninSchema = userSignupSchema.pick({
+    email: true,
+    password: true
+})
 
 export const changePasswordSchema = z.object({
     oldPassword: passwordSchema,

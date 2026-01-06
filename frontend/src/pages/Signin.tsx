@@ -80,6 +80,7 @@ const Signin = () => {
                                     error={errors.password?.message}
                                 />
                                 <Button
+                                    type="button"
                                     variant={"ghost"}
                                     size={"icon"}
                                     className="absolute right-0 top-0 px-3 hover:bg-transparent"

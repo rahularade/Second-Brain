@@ -1,9 +1,12 @@
 import z from "zod";
 
+export const CONTENT_TYPES = ["tweet", "video", "link"] as const;
+export type ContentType =  typeof CONTENT_TYPES[number];
+
 export const contentSchema = z.object({
     title: z.string().trim().min(3, "Title must be at least 3 characters"),
     link: z.url("Invalid link"),
-    type: z.enum(["tweet", "video", "link"]),
+    type: z.enum(CONTENT_TYPES),
     tags: z
         .array(
             z
@@ -17,4 +20,4 @@ export const contentSchema = z.object({
         .max(10, "Maximum 10 tags allowed"),
 });
 
-export type ContentType = z.infer<typeof contentSchema>
+export type ContentInput = z.infer<typeof contentSchema>

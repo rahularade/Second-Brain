@@ -36,20 +36,17 @@ export interface ButtonProps
     extends React.ButtonHTMLAttributes<HTMLButtonElement>,
         VariantProps<typeof buttonVarients> {}
 
-const Button: React.FC<ButtonProps> = ({
+const Button = ({
     variant,
     size,
     className,
-    children,
     ...props
-}) => {
+}: ButtonProps) => {
     return (
         <button
             className={cn(buttonVarients({ variant, size }), className)}
             {...props}
-        >
-            {children}
-        </button>
+        />
     );
 };
 

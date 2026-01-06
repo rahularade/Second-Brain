@@ -1,7 +1,7 @@
 import { ArrowRight, Link2, Sparkles, Twitter, Youtube } from "lucide-react";
-import Footer from "../components/Footer";
-import Navbar from "../components/Navbar";
-import FeatureCard from "../components/FeatureCard";
+import Footer from "../components/landing/Footer";
+import Navbar from "../components/landing/Navbar";
+import FeatureCard from "../components/landing/FeatureCard";
 import { Link } from "react-router-dom";
 import Button from "../components/ui/Button";
 

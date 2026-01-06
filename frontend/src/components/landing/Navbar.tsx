@@ -1,6 +1,7 @@
 import { Brain } from "lucide-react";
 import { Link } from "react-router-dom";
 import Button from "../ui/Button";
+import ThemeToggler from "../ThemeToggler";
 
 
 const Navbar = () => {
@@ -11,6 +12,7 @@ const Navbar = () => {
             <span className="text-xl font-bold">Second Brain</span>
         </div>
         <div className="flex items-center gap-4">
+          <ThemeToggler />
           <Button variant={"ghost"}>
             <Link to={"/signin"}>Sign In</Link>
           </Button>

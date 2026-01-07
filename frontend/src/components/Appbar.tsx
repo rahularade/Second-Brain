@@ -1,4 +1,4 @@
-import { PanelLeft, User } from "lucide-react";
+import { PanelLeft, Share2, User } from "lucide-react";
 import Button from "./ui/Button";
 import ThemeToggler from "./ThemeToggler";
 import DropdownMenu from "./DropdownMenu";
@@ -6,10 +6,10 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "../lib/utils";
 
 interface AppbarProps {
-    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Appbar = ({setIsOpen}: AppbarProps) => {
+const Appbar = ({ setIsOpen }: AppbarProps) => {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
@@ -26,14 +26,25 @@ const Appbar = ({setIsOpen}: AppbarProps) => {
 
     return (
         <header className="sticky top-0 z-10 flex h-14 w-full items-center justify-between gap-4 border-b bg-background/95 backdrop-blur px-2 sm:px-4">
-            <Button variant={"ghost"} size={"icon"} onClick={() => setIsOpen(prev => !prev)}>
+            <Button
+                variant={"ghost"}
+                size={"icon"}
+                onClick={() => setIsOpen((prev) => !prev)}
+            >
                 <PanelLeft className="size-4" />
             </Button>
             <div ref={ref} className="flex items-center gap-0.5 sm:gap-4">
                 <ThemeToggler />
+                <Button variant={"ghost"} className="flex items-center gap-2">
+                    <Share2 className="size-4" />
+                    <p className="hidden sm:block">Share Brain</p>
+                </Button>
                 <Button
                     variant={"ghost"}
-                    className={cn("flex items-center gap-2", open && "hover:bg-transparent cursor-default")}
+                    className={cn(
+                        "flex items-center gap-2 ",
+                        open && "hover:bg-transparent cursor-default"
+                    )}
                     onClick={() => setOpen((prev) => !prev)}
                 >
                     <User className="h-4 w-4" />

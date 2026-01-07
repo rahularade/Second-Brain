@@ -107,7 +107,7 @@ const Dashboard = () => {
                             </div>
                             <Button className="flex-1 sm:flex-none">
                                 <Plus className="size-5"/>
-                                <p className="hidden sm:block">Add <span >Content</span></p>
+                                <p className="hidden sm:block">Add Content</p>
                             </Button>
                         </div>
                     </div>

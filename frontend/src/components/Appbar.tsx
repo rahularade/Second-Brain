@@ -3,6 +3,7 @@ import Button from "./ui/Button";
 import ThemeToggler from "./ThemeToggler";
 import DropdownMenu from "./DropdownMenu";
 import { useEffect, useRef, useState } from "react";
+import { cn } from "../lib/utils";
 
 interface AppbarProps {
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -32,7 +33,7 @@ const Appbar = ({setIsOpen}: AppbarProps) => {
                 <ThemeToggler />
                 <Button
                     variant={"ghost"}
-                    className="flex items-center gap-2"
+                    className={cn("flex items-center gap-2", open && "hover:bg-transparent cursor-default")}
                     onClick={() => setOpen((prev) => !prev)}
                 >
                     <User className="h-4 w-4" />

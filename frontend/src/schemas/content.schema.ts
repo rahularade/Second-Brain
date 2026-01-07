@@ -21,3 +21,8 @@ export const contentSchema = z.object({
 });
 
 export type ContentInput = z.infer<typeof contentSchema>
+export interface Content extends ContentInput {
+    id: string,
+    createdAt: string,
+    updatedAt: string
+}

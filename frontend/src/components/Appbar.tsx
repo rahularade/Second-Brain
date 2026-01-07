@@ -24,7 +24,7 @@ const Appbar = ({setIsOpen}: AppbarProps) => {
     }, []);
 
     return (
-        <header className="sticky top-0 z-10 flex h-14 w-full items-center justify-between gap-4 border-b bg-background/95 backdrop-blur px-4">
+        <header className="sticky top-0 z-10 flex h-14 w-full items-center justify-between gap-4 border-b bg-background/95 backdrop-blur px-2 sm:px-4">
             <Button variant={"ghost"} size={"icon"} onClick={() => setIsOpen(prev => !prev)}>
                 <PanelLeft className="size-4" />
             </Button>

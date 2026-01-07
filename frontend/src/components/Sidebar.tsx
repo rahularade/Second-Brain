@@ -11,7 +11,7 @@ interface SidebarProps {
 }
 
 const filters = [
-    { value: "all" as const, label: "All Links", icon: LayoutGrid },
+    { value: "all" as const, label: "All Contents", icon: LayoutGrid },
     { value: "video" as const, label: "Videos", icon: Video },
     { value: "tweet" as const, label: "Tweets", icon: Twitter },
     { value: "link" as const, label: "Links", icon: Link2 },

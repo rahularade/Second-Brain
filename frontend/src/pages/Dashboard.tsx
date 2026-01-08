@@ -7,10 +7,15 @@ import { Plus, Search } from "lucide-react";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import ContentCard from "../components/ContentCard";
+import AddEditContentModal from "../components/AddEditContentModal";
 
 const Dashboard = () => {
-    const [isOpen, setIsOpen] = useState(window.matchMedia("(max-width: 768px)").matches ? false : true);
+    const [isOpen, setIsOpen] = useState(
+        window.matchMedia("(max-width: 768px)").matches ? false : true
+    );
     const [activeTab, setActiveTab] = useState<ContentType | "all">("all");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingContent, setEditingContent] = useState<Content | null>(null);
 
     const onClose = () => setIsOpen(false);
     const onTabChange = (tab: ContentType | "all") => {
@@ -18,6 +23,16 @@ const Dashboard = () => {
         if (window.matchMedia("(max-width: 768px)").matches) {
             setIsOpen(false);
         }
+    };
+
+    const handleAddNew = () => {
+        setEditingContent(null);
+        setIsModalOpen(true);
+    };
+
+    const handleEdit = (content: Content) => {
+        setEditingContent(content);
+        setIsModalOpen(true);
     };
 
     const contents: Content[] = [
@@ -37,7 +52,7 @@ const Dashboard = () => {
             link: "https://twitter.com/example/status/123456789",
             createdAt: "2026-01-04T08:46:24.351Z",
             updatedAt: "2026-01-04T08:46:24.351Z",
-            tags: ["ai", "tech"],
+            tags: ["ai", "tech", "tweet"],
         },
         {
             id: "f7413ca4-6989-4df5-bbe6-e562d92c55f5",
@@ -98,22 +113,34 @@ const Dashboard = () => {
                         </div>
                         <div className="flex items-center gap-2 sm:gap-4">
                             <div className="relative w-72">
-                                <Search className="absolute size-4 left-3 top-1/2 -translate-y-1/2 text-muted-foreground"/>
+                                <Search className="absolute size-4 left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                                 <Input
                                     type="search"
                                     placeholder="Search by title..."
                                     className="pl-9"
                                 />
                             </div>
-                            <Button className="flex-1 sm:flex-none">
-                                <Plus className="size-5"/>
+                            <Button className="flex-1 sm:flex-none" onClick={handleAddNew}>
+                                <Plus className="size-5" />
                                 <p className="hidden sm:block">Add Content</p>
                             </Button>
                         </div>
                     </div>
-                    <div className={cn("grid gap-4 sm:grid-cols-2 md:grid-cols-3", !isOpen && "sm:grid-cols-3 md:grid-cols-4")}>
-                        {contents.map(content => <ContentCard content={content}/>)}
+                    <div
+                        className={cn(
+                            "grid gap-4 sm:grid-cols-2 md:grid-cols-3",
+                            !isOpen && "sm:grid-cols-3 md:grid-cols-4"
+                        )}
+                    >
+                        {contents.map((content) => (
+                            <ContentCard key={content.id} content={content} handleEdit={handleEdit} />
+                        ))}
                     </div>
+                    <AddEditContentModal
+                        open={isModalOpen}
+                        setIsModalOpen={setIsModalOpen}
+                        content={editingContent}
+                    />
                 </main>
             </div>
         </div>

@@ -4,9 +4,12 @@ import tweet from "../assets/tweet.png";
 import video from "../assets/video.png";
 import { formatDistanceToNow } from "date-fns";
 import type { Content } from "../schemas/content.schema";
+import { useState } from "react";
+import Modal from "./ui/Modal";
 
 interface ContentCardProps {
     content: Content;
+    handleEdit: (content: Content) => void;
 }
 
 const typeIcons = {
@@ -21,8 +24,9 @@ const typeColors = {
     link: "bg-primary/10 text-primary",
 };
 
-const ContentCard = ({ content }: ContentCardProps) => {
+const ContentCard = ({ content, handleEdit }: ContentCardProps) => {
     const Icon = typeIcons[content.type];
+    const [isModalOpen, setIsModalOpen] = useState(false);
     return (
         <div className="flex flex-col gap-2 rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow p-6">
             <div className="flex items-start justify-between gap-2">
@@ -39,16 +43,29 @@ const ContentCard = ({ content }: ContentCardProps) => {
                     </span>
                 </div>
                 <div className="flex gap-1">
-                    <Button variant={"ghost"} size={"icon"} className="h-7 w-7">
+                    <Button variant={"ghost"} size={"icon"} className="h-7 w-7" onClick={() => handleEdit(content)}>
                         <Pencil className="size-3.5" />
                     </Button>
                     <Button
                         variant={"ghost"}
                         size={"icon"}
                         className="h-7 w-7 text-destructive"
+                        onClick={() => setIsModalOpen(true)}
                     >
                         <Trash2 className="size-3.5" />
                     </Button>
+                    <Modal open={isModalOpen}>
+                        <div className="grid w-11/12 max-w-lg gap-4 p-6 border bg-background shadow-lg rounded-lg duration-200">
+                            <div className="flex flex-col gap-2 text-center sm:text-left">
+                                <h1 className="text-lg font-semibold">Delete Content</h1>
+                                <p className="text-sm text-muted-foreground">Are you sure you want to delete "<span className="font-semibold">{content.title}</span>"? This action cannot be undone.</p>
+                            </div>
+                            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+                                <Button variant={"outline"} onClick={() => setIsModalOpen(false)}>Cancel</Button>
+                                <Button variant={"destructive"}>Delete</Button>
+                            </div>
+                        </div>
+                    </Modal>
                 </div>
             </div>
             <div className="flex flex-col gap-1.5">
@@ -82,7 +99,7 @@ const ContentCard = ({ content }: ContentCardProps) => {
                 {content.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                         {content.tags.map((tag) => (
-                            <span className="bg-secondary py-0.5 px-2.5 text-xs rounded-full">
+                            <span key={tag} className="bg-secondary py-0.5 px-2.5 text-xs rounded-full">
                                 {tag}
                             </span>
                         ))}

@@ -1,17 +1,17 @@
-import { Brain, Eye, EyeOff } from "lucide-react";
+import { Brain } from "lucide-react";
 import { Link } from "react-router-dom";
 import Input from "../components/ui/Input";
-import { useState } from "react";
 import Button from "../components/ui/Button";
 import Label from "../components/ui/Label";
 import { useForm } from "react-hook-form";
 import { userSignupSchema, type UserSignupInput } from "../schemas/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import PasswordField from "../components/PasswordField";
 
 const Signup = () => {
-    const [showPassword, setShowPassword] = useState(false);
     const {
         register,
+        control,
         handleSubmit,
         formState: { errors },
     } = useForm<UserSignupInput>({
@@ -88,30 +88,7 @@ const Signup = () => {
                             >
                                 Password
                             </Label>
-                            <div className="relative">
-                                <Input
-                                    id="password"
-                                    type={showPassword ? "text" : "password"}
-                                    placeholder="••••••••"
-                                    {...register("password")}
-                                    error={errors.password?.message}
-                                />
-                                <Button
-                                    type="button"
-                                    variant={"ghost"}
-                                    size={"icon"}
-                                    className="absolute right-0 top-0 px-3 hover:bg-transparent"
-                                    onClick={() =>
-                                        setShowPassword(!showPassword)
-                                    }
-                                >
-                                    {showPassword ? (
-                                        <EyeOff className="h-4 w-4 text-muted-foreground" />
-                                    ) : (
-                                        <Eye className="h-4 w-4 text-muted-foreground" />
-                                    )}
-                                </Button>
-                            </div>
+                            <PasswordField id="password" control={control} name="password"/>
                             {errors.password && (
                                 <p className="text-destructive text-sm">
                                     {errors.password?.message}

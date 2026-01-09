@@ -4,25 +4,30 @@ import ThemeToggler from "./ThemeToggler";
 import DropdownMenu from "./DropdownMenu";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "../lib/utils";
+import SharePopover from "./SharePopover";
 
 interface AppbarProps {
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Appbar = ({ setIsOpen }: AppbarProps) => {
-    const [open, setOpen] = useState(false);
+    const [activePopover, setActivePopover] = useState<
+        "profile" | "share" | null
+    >(null);
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         function handleClick(event: MouseEvent) {
             if (ref.current && !ref.current.contains(event.target as Node)) {
-                setOpen(false);
+                setActivePopover(null);
             }
         }
 
         document.addEventListener("mousedown", handleClick);
         return () => document.removeEventListener("mousedown", handleClick);
     }, []);
+
+    const onClose = () => setActivePopover(null)
 
     return (
         <header className="sticky top-0 z-10 flex h-14 w-full items-center justify-between gap-4 border-b bg-background/95 backdrop-blur px-2 sm:px-4">
@@ -35,22 +40,40 @@ const Appbar = ({ setIsOpen }: AppbarProps) => {
             </Button>
             <div ref={ref} className="flex items-center gap-0.5 sm:gap-4">
                 <ThemeToggler />
-                <Button variant={"ghost"} className="flex items-center gap-2">
+                <Button
+                    variant={"ghost"}
+                    size={"icon"}
+                    className={cn(
+                        "flex items-center gap-2",
+                        activePopover === "share" &&
+                            "hover:bg-transparent cursor-default"
+                    )}
+                    onClick={() =>
+                        setActivePopover((prev) =>
+                            prev === "share" ? null : "share"
+                        )
+                    }
+                >
                     <Share2 className="size-4" />
-                    <p className="hidden sm:block">Share Brain</p>
                 </Button>
                 <Button
                     variant={"ghost"}
                     className={cn(
-                        "flex items-center gap-2 ",
-                        open && "hover:bg-transparent cursor-default"
+                        "flex items-center gap-2",
+                        activePopover === "profile" &&
+                            "hover:bg-transparent cursor-default"
                     )}
-                    onClick={() => setOpen((prev) => !prev)}
+                    onClick={() =>
+                        setActivePopover((prev) =>
+                            prev === "profile" ? null : "profile"
+                        )
+                    }
                 >
                     <User className="h-4 w-4" />
                     <span className="hidden sm:inline">John Doe</span>
                 </Button>
-                {open && <DropdownMenu />}
+                <DropdownMenu open={activePopover === "profile"} onClose={onClose}/>
+                <SharePopover open={activePopover === "share"} onClose={onClose}/>
             </div>
         </header>
     );

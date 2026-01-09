@@ -3,7 +3,12 @@ import { ContentType } from "../generated/prisma/enums.js";
 
 export const contentSchema = z.object({
     title: z
-        .string("Title is required.")
+        .string({
+            error: (title) =>
+                title.input === undefined
+                    ? "Title is required."
+                    : "Invalid title.",
+        })
         .trim()
         .min(3, "Title must be at least 3 characters."),
     link: z.url({
@@ -13,7 +18,12 @@ export const contentSchema = z.object({
             link.input === undefined ? "Link is required." : "Invalid link.",
     }),
     type: z
-        .string("Type is required.")
+        .string({
+            error: (type) =>
+                type.input === undefined
+                    ? "Type is required."
+                    : "Invalid content type.",
+        })
         .toUpperCase()
         .pipe(z.enum(ContentType, "Invalid content type.")),
     tags: z
@@ -22,9 +32,14 @@ export const contentSchema = z.object({
                 .string("Invalid tag name.")
                 .trim()
                 .min(2, "Tag must be at least 2 characters.")
-                .max(20, "Tag name too long.")
+                .max(20, "Tag is too long (maximum 20 characters).")
                 .toLowerCase(),
-            "Tags are required."
+            {
+                error: (tags) =>
+                    tags.input === undefined
+                        ? "Tags is required."
+                        : "Invalid tags.",
+            }
         )
         .min(1, "At least 1 tag is required.")
         .max(10, "Maximum 10 tags allowed."),

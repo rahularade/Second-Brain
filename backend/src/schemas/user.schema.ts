@@ -1,7 +1,12 @@
 import z from "zod";
 
 const passwordSchema = z
-    .string("Password is required.")
+    .string({
+            error: (password) =>
+                password.input === undefined
+                    ? "Password is required."
+                    : "Invalid password.",
+        })
     .min(8, "Password must be at least 8 characters.")
     .max(30, "Password must be less than 30 characters.")
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter.")
@@ -13,7 +18,12 @@ const passwordSchema = z
 
 export const userSignupSchema = z.object({
     name: z
-        .string("Name is required.")
+        .string({
+            error: (name) =>
+                name.input === undefined
+                    ? "Name is required."
+                    : "Invalid name.",
+        })
         .trim()
         .min(3, "Name must be at least 3 characters.")
         .max(30, "Name must be less than 30 characters."),

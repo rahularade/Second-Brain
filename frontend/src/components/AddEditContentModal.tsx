@@ -1,4 +1,4 @@
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
     contentSchema,
     type Content,
@@ -10,10 +10,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Label from "./ui/Label";
 import Input from "./ui/Input";
 import { useEffect } from "react";
-import { cn } from "../lib/utils";
-import Select, { type ClassNamesConfig } from "react-select";
-import CreatableSelect from "react-select/creatable";
-import { ChevronDown, X } from "lucide-react";
+import TypeField from "./TypeField";
+import TagsField from "./TagsField";
 
 interface AddEditContentModalProps {
     open: boolean;
@@ -66,70 +64,9 @@ const AddEditContentModal = ({
         reset();
     };
 
-    const onSubmit = (data: ContentInput) => {
+    const onSubmit = async (data: ContentInput) => {
+        await new Promise(res => setTimeout(res, 2000))
         console.log(data);
-    };
-
-    const options = [
-        { value: "tweet", label: "Tweet" },
-        { value: "video", label: "Video" },
-        { value: "link", label: "Link" },
-    ];
-
-    const SelectStyles: ClassNamesConfig = {
-        control: ({ isFocused, isDisabled }) =>
-            cn(
-                "min-h-10 w-full px-3 py-2 rounded-md border bg-background text-sm",
-                "border-input",
-                "outline-none",
-                !isDisabled && isFocused && "ring-2 ring-ring/50",
-                isDisabled && "cursor-not-allowed opacity-50",
-                errors.type?.message && "border-destructive ring-destructive/50"
-            ),
-        input: () => "h-5.5 text-sm text-foreground",
-        singleValue: () => "capitalize",
-        placeholder: () => "text-muted-foreground",
-        menuList: () => "rounded-md border bg-popover shadow-md max-h-40!",
-        option: ({ isFocused, isSelected }) =>
-            cn(
-                "cursor-pointer px-3 py-2 text-sm! capitalize",
-                isSelected && "bg-primary text-primary-foreground",
-                !isSelected && isFocused && "bg-accent"
-            ),
-        noOptionsMessage: () => "py-2 text-sm",
-        dropdownIndicator: () =>
-            "px-1 hover:cursor-pointer text-muted-foreground first:stroke-1",
-    };
-
-    const CreatableStyles: ClassNamesConfig = {
-        control: ({ isFocused, isDisabled }) =>
-            cn(
-                "min-h-10 w-full px-3 py-2 rounded-md border bg-background text-sm",
-                "border-input",
-                "outline-none",
-                !isDisabled && isFocused && "ring-2 ring-ring/50",
-                isDisabled && "cursor-not-allowed opacity-50",
-                errors.tags?.message && "border-destructive ring-destructive/50"
-            ),
-        valueContainer: () => "gap-2",
-        input: () => "h-5.5 text-sm text-foreground",
-        placeholder: () => "text-muted-foreground",
-        multiValue: () =>
-            "bg-secondary text-secondary-foreground rounded-full px-2 py-px",
-        multiValueLabel: () => "text-sm",
-        multiValueRemove: () => "cursor-pointer",
-        menuList: () => "rounded-md border bg-popover shadow-md max-h-40!",
-        option: ({ isFocused, isSelected }) =>
-            cn(
-                "cursor-pointer px-3 py-2 text-sm!",
-                isSelected && "bg-primary text-primary-foreground",
-                !isSelected && isFocused && "bg-accent"
-            ),
-        noOptionsMessage: () => "py-2 text-sm",
-        loadingMessage: () => "py-2 text-sm",
-        clearIndicator: () => "px-1 hover:cursor-pointer text-muted-foreground",
-        dropdownIndicator: () =>
-            "px-1 hover:cursor-pointer text-muted-foreground first:stroke-1",
     };
 
     return (
@@ -180,39 +117,10 @@ const AddEditContentModal = ({
                             )}
                         </div>
                         <div className="flex flex-col gap-2">
-                            <Label error={errors.type?.message}>
+                            <Label htmlFor="type" error={errors.type?.message}>
                                 Type
                             </Label>
-                            <Controller
-                                control={control}
-                                name="type"
-                                render={({ field }) => (
-                                    <Select
-                                        value={
-                                            field?.value && {
-                                                label: field.value,
-                                                value: field.value,
-                                            }
-                                        }
-                                        onChange={(option: any) =>
-                                            field.onChange(option.value)
-                                        }
-                                        unstyled
-                                        options={options}
-                                        classNames={SelectStyles}
-                                        components={{
-                                            DropdownIndicator: (props) => (
-                                                <div
-                                                    {...props.innerProps}
-                                                    className="cursor-pointer text-foreground"
-                                                >
-                                                    <ChevronDown className="size-5" />
-                                                </div>
-                                            ),
-                                        }}
-                                    />
-                                )}
-                            />
+                            <TypeField control={control} name="type"/>
                             {errors.type && (
                                 <p className="text-destructive text-sm">
                                     {errors.type?.message}
@@ -220,71 +128,12 @@ const AddEditContentModal = ({
                             )}
                         </div>
                         <div className="flex flex-col gap-2">
-                            <Label error={errors.tags?.message}>
+                            <Label htmlFor="tags" error={errors.tags?.message}>
                                 Tags
                             </Label>
-                            <Controller
+                            <TagsField
                                 control={control}
                                 name="tags"
-                                render={({ field }) => (
-                                    <CreatableSelect
-                                        isMulti
-                                        unstyled
-                                        value={field.value?.map((v) => ({
-                                            label: v,
-                                            value: v,
-                                        }))}
-                                        options={options}
-                                        onChange={(options) => {
-                                            field.onChange(
-                                                options.map(
-                                                    (tag: any) => tag.value
-                                                )
-                                            );
-                                        }}
-                                        onCreateOption={(inputValue) => {
-                                            const tag = inputValue
-                                                .trim()
-                                                .toLowerCase();
-                                            if (field.value?.includes(tag))
-                                                return;
-                                            field.onChange([
-                                                ...field.value,
-                                                tag,
-                                            ]);
-                                        }}
-                                        isValidNewOption={(inputValue) =>
-                                            inputValue.trim().length > 1
-                                        }
-                                        classNames={CreatableStyles}
-                                        components={{
-                                            DropdownIndicator: (props) => (
-                                                <div
-                                                    {...props.innerProps}
-                                                    className="cursor-pointer text-foreground"
-                                                >
-                                                    <ChevronDown className="size-5" />
-                                                </div>
-                                            ),
-                                            ClearIndicator: (props) => (
-                                                <div
-                                                    {...props.innerProps}
-                                                    className="px-2 cursor-pointer hover:text-destructive"
-                                                >
-                                                    <X className="size-5" />
-                                                </div>
-                                            ),
-                                            MultiValueRemove: (props) => (
-                                                <div
-                                                    {...props.innerProps}
-                                                    className="cursor-pointer py-0.5 pl-0.5 hover:text-destructive"
-                                                >
-                                                    <X className="h-4 w-4" />
-                                                </div>
-                                            ),
-                                        }}
-                                    />
-                                )}
                             />
                             {errors.tags && (
                                 <p className="text-destructive text-sm">

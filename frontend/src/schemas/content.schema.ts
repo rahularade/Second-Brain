@@ -4,7 +4,7 @@ export const CONTENT_TYPES = ["tweet", "video", "link"] as const;
 export type ContentType = (typeof CONTENT_TYPES)[number];
 
 export const contentSchema = z.object({
-    title: z.string("Title is required.").trim().min(3, "Title must be at least 3 characters."),
+    title: z.string("Title is required.").trim().min(3, {error: (title) => title.input === "" ? "Title is required." : "Must be at least 3 characters."}),
     link: z.url({
         protocol: /^https?$/,
         hostname: z.regexes.domain,

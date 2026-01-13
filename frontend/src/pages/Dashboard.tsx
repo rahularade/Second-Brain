@@ -9,6 +9,7 @@ import Button from "../components/ui/Button";
 import ContentCard from "../components/ContentCard";
 import AddEditContentModal from "../components/AddEditContentModal";
 import DeleteAccountModal from "../components/DeleteAccountModal";
+import ChangePasswordModal from "../components/ChangePasswordModal";
 
 const Dashboard = () => {
     const [isOpen, setIsOpen] = useState(
@@ -18,6 +19,7 @@ const Dashboard = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingContent, setEditingContent] = useState<Content | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
 
     const onClose = () => setIsOpen(false);
     const onTabChange = (tab: ContentType | "all") => {
@@ -99,7 +101,7 @@ const Dashboard = () => {
                     isOpen && "md:ml-72"
                 )}
             >
-                <Appbar setIsOpen={setIsOpen} setIsDeleteModalOpen={setIsDeleteModalOpen}/>
+                <Appbar setIsOpen={setIsOpen} setIsDeleteModalOpen={setIsDeleteModalOpen} setIsChangePasswordModalOpen={setIsChangePasswordModalOpen}/>
                 <main className="flex-1 p-4 sm:p-6">
                     <div className="flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between mb-6">
                         <div className="flex flex-col gap-0.5">
@@ -144,6 +146,7 @@ const Dashboard = () => {
                         content={editingContent}
                     />
                     <DeleteAccountModal open={isDeleteModalOpen} setOpen={setIsDeleteModalOpen}/>
+                    <ChangePasswordModal open={isChangePasswordModalOpen} setOpen={setIsChangePasswordModalOpen}/>
                 </main>
             </div>
         </div>

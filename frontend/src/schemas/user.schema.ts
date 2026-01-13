@@ -37,6 +37,15 @@ export const userSigninSchema = userSignupSchema.pick({
 export const changePasswordSchema = z.object({
     oldPassword: passwordSchema,
     newPassword: passwordSchema,
+    confirmPassword: z.string("Confirm password is required."),
+}).superRefine((data, ctx) => {
+    if(data.newPassword !== data.confirmPassword){
+        ctx.addIssue({
+            path: ["confirmPassword"],
+            message: "",
+            code: "custom"
+        })
+    }
 });
 
 export type UserSignupInput = z.infer<typeof userSignupSchema>;

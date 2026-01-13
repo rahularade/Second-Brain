@@ -7,11 +7,17 @@ interface SharePopoverProps{
     open: boolean,
     onClose: () => void
     onDelete: () => void
+    onChangePassword: () => void
 }
 
-const DropdownMenu = ({ open, onClose, onDelete }: SharePopoverProps) => {
+const DropdownMenu = ({ open, onClose, onDelete, onChangePassword }: SharePopoverProps) => {
     const handleDelete = () => {
         onDelete();
+        onClose();
+    };
+
+    const handleChangePassword = () => {
+        onChangePassword();
         onClose();
     };
 
@@ -29,6 +35,7 @@ const DropdownMenu = ({ open, onClose, onDelete }: SharePopoverProps) => {
                 variant={"ghost"}
                 size={"sm"}
                 className="justify-baseline px-2 py-1.5 w-full"
+                onClick={handleChangePassword}
             >
                 <KeyRound className="mr-2 h-4 w-4" />
                 Change Password

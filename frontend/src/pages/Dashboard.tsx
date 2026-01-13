@@ -8,6 +8,7 @@ import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import ContentCard from "../components/ContentCard";
 import AddEditContentModal from "../components/AddEditContentModal";
+import DeleteAccountModal from "../components/DeleteAccountModal";
 
 const Dashboard = () => {
     const [isOpen, setIsOpen] = useState(
@@ -16,6 +17,7 @@ const Dashboard = () => {
     const [activeTab, setActiveTab] = useState<ContentType | "all">("all");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingContent, setEditingContent] = useState<Content | null>(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     const onClose = () => setIsOpen(false);
     const onTabChange = (tab: ContentType | "all") => {
@@ -97,7 +99,7 @@ const Dashboard = () => {
                     isOpen && "md:ml-72"
                 )}
             >
-                <Appbar setIsOpen={setIsOpen} />
+                <Appbar setIsOpen={setIsOpen} setIsDeleteModalOpen={setIsDeleteModalOpen}/>
                 <main className="flex-1 p-4 sm:p-6">
                     <div className="flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between mb-6">
                         <div className="flex flex-col gap-0.5">
@@ -141,6 +143,7 @@ const Dashboard = () => {
                         setIsModalOpen={setIsModalOpen}
                         content={editingContent}
                     />
+                    <DeleteAccountModal open={isDeleteModalOpen} setOpen={setIsDeleteModalOpen}/>
                 </main>
             </div>
         </div>

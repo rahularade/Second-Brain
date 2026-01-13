@@ -6,9 +6,15 @@ import { cn } from "../lib/utils";
 interface SharePopoverProps{
     open: boolean,
     onClose: () => void
+    onDelete: () => void
 }
 
-const DropdownMenu = ({ open, onClose }: SharePopoverProps) => {
+const DropdownMenu = ({ open, onClose, onDelete }: SharePopoverProps) => {
+    const handleDelete = () => {
+        onDelete();
+        onClose();
+    };
+
     return (
         <div
             className={cn(
@@ -40,6 +46,7 @@ const DropdownMenu = ({ open, onClose }: SharePopoverProps) => {
                 variant={"ghost"}
                 size={"sm"}
                 className="justify-baseline px-2 py-1.5 w-full text-destructive hover:text-destructive"
+                onClick={handleDelete}
             >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete Account

@@ -8,9 +8,10 @@ import SharePopover from "./SharePopover";
 
 interface AppbarProps {
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Appbar = ({ setIsOpen }: AppbarProps) => {
+const Appbar = ({ setIsOpen, setIsDeleteModalOpen }: AppbarProps) => {
     const [activePopover, setActivePopover] = useState<
         "profile" | "share" | null
     >(null);
@@ -72,7 +73,7 @@ const Appbar = ({ setIsOpen }: AppbarProps) => {
                     <User className="h-4 w-4" />
                     <span className="hidden sm:inline">John Doe</span>
                 </Button>
-                <DropdownMenu open={activePopover === "profile"} onClose={onClose}/>
+                <DropdownMenu open={activePopover === "profile"} onClose={onClose} onDelete={() => setIsDeleteModalOpen(true)}/>
                 <SharePopover open={activePopover === "share"} onClose={onClose}/>
             </div>
         </header>

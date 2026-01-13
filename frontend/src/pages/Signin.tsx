@@ -1,5 +1,5 @@
 import { Brain } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import { useForm } from "react-hook-form";
@@ -7,8 +7,12 @@ import { userSigninSchema, type UserSigninInput } from "../schemas/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Label from "../components/ui/Label";
 import PasswordField from "../components/PasswordField";
+import { useMutation } from "@tanstack/react-query";
+import { signin } from "../api/auth";
+import { toast } from "sonner";
 
 const Signin = () => {
+    const navigate = useNavigate();
     const {
         register,
         control,
@@ -16,10 +20,25 @@ const Signin = () => {
         formState: { errors },
     } = useForm<UserSigninInput>({
         resolver: zodResolver(userSigninSchema),
+        defaultValues: {
+            email: "",
+            password:""
+        }
+    });
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: signin,
+        onSuccess: () => {
+            toast.success("Signed in successfully.")
+            navigate("/dashboard");
+        },
+        onError: (error) => {
+            toast.error(`${error.message}.`)
+        },
     });
 
     const onSubmit = (data: UserSigninInput) => {
-        console.log(data);
+        mutate(data);
     };
 
     return (
@@ -71,7 +90,11 @@ const Signin = () => {
                             >
                                 Password
                             </Label>
-                            <PasswordField id="password" control={control} name="password"/>
+                            <PasswordField
+                                id="password"
+                                control={control}
+                                name="password"
+                            />
                             {errors.password && (
                                 <p className="text-destructive text-sm">
                                     {errors.password?.message}
@@ -80,8 +103,8 @@ const Signin = () => {
                         </div>
                     </div>
                     <div className="flex flex-col gap-4 p-6 pt-0">
-                        <Button type="submit" className="w-full">
-                            Sign In
+                        <Button type="submit" className="w-full" disabled={isPending}>
+                            {isPending ? "Signing in..." : "Sign In"}
                         </Button>
                         <p className="text-sm text-muted-foreground text-center">
                             Don't have an account?{" "}

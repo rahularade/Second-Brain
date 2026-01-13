@@ -1,5 +1,5 @@
 import { Brain } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import Label from "../components/ui/Label";
@@ -7,8 +7,12 @@ import { useForm } from "react-hook-form";
 import { userSignupSchema, type UserSignupInput } from "../schemas/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PasswordField from "../components/PasswordField";
+import { useMutation } from "@tanstack/react-query";
+import { signup } from "../api/auth";
+import { toast } from "sonner";
 
 const Signup = () => {
+    const navigate = useNavigate()
     const {
         register,
         control,
@@ -16,10 +20,26 @@ const Signup = () => {
         formState: { errors },
     } = useForm<UserSignupInput>({
         resolver: zodResolver(userSignupSchema),
+        defaultValues: {
+            name: "",
+            email: "",
+            password: ""
+        }
+    });
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: signup,
+        onSuccess: () => {
+            toast.success("Account created successfully.")
+            navigate("/dashboard");
+        },
+        onError: (error) => {
+            toast.error(`${error.message}.`)
+        }
     });
 
     const onSubmit = (data: UserSignupInput) => {
-        console.log(data);
+        mutate(data);
     };
 
     return (
@@ -98,7 +118,7 @@ const Signup = () => {
                     </div>
                     <div className="flex flex-col gap-4 p-6 pt-0">
                         <Button type="submit" className="w-full">
-                            Create Account
+                            {isPending ? "Create account..." : "Create Account"}
                         </Button>
                         <p className="text-sm text-muted-foreground text-center">
                             Already have an account?{" "}
@@ -109,6 +129,11 @@ const Signup = () => {
                                 Sign in
                             </Link>
                         </p>
+                        {errors.root && (
+                            <p className="text-sm text-destructive text-center">
+                                {`${errors.root.message}!`}
+                            </p>
+                        )}
                     </div>
                 </form>
             </div>

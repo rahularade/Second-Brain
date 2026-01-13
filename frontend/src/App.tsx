@@ -4,6 +4,7 @@ import Signup from "./pages/Signup";
 import Signin from "./pages/Signin";
 import { ThemeProvider } from "next-themes";
 import Dashboard from "./pages/Dashboard";
+import { Toaster } from "sonner"
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
                     <Route path="/dashboard" element={<Dashboard />}/>
                 </Routes>
             </BrowserRouter>
+            <Toaster richColors/>
         </ThemeProvider>
     );
 }

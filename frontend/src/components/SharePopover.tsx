@@ -2,6 +2,10 @@ import { Copy, Trash2 } from "lucide-react";
 import { cn } from "../lib/utils";
 import Button from "./ui/Button";
 import Input from "./ui/Input";
+import { useMutation } from "@tanstack/react-query";
+import { createShareLink, deleteShareLink } from "../api/shareLink";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface SharePopoverProps {
     open: boolean;
@@ -9,7 +13,36 @@ interface SharePopoverProps {
 }
 
 const SharePopover = ({ open, onClose }: SharePopoverProps) => {
-    const shareLink = "http://localhost:3000";
+    const [shareLink, setShareLink] = useState("");
+    const createMutation = useMutation({
+        mutationFn: createShareLink,
+        onSuccess: (data) => {
+            const fullLink = `${window.location.origin}/brain/${data.hash}`
+            setShareLink(fullLink)
+        },
+        onError: (error) => {
+            toast.error(`${error.message}.`)
+            onClose()
+        }
+    })
+
+    const deleteMutation = useMutation({
+        mutationFn: deleteShareLink,
+        onSuccess: () => {
+            toast.success("Sharelink deleted successfully")
+            onClose()
+        },
+        onError: (error) => {
+            toast.error(`${error.message}.`)
+        }
+    })
+
+    useEffect(() => {
+      if(open){
+        createMutation.mutate()
+      }
+    }, [open]);
+    
     function fallbackCopyText(text: string) {
         const textarea = document.createElement("textarea");
         textarea.value = text;
@@ -31,6 +64,8 @@ const SharePopover = ({ open, onClose }: SharePopoverProps) => {
             onClose();
         } catch {
             fallbackCopyText(shareLink);
+        } finally {
+            toast.success("Sharelink copied to clipboard");
         }
     };
     return (
@@ -53,7 +88,7 @@ const SharePopover = ({ open, onClose }: SharePopoverProps) => {
             </div>
             <Input readOnly className="h-8" value={shareLink} />
             <div className="grid grid-cols-2 gap-2">
-                <Button variant={"destructive"} size={"sm"}>
+                <Button variant={"destructive"} size={"sm"} onClick={() => deleteMutation.mutate()} disabled={deleteMutation.isPending}>
                     <Trash2 className="h-4 w-4" />
                     Delete
                 </Button>

@@ -2,8 +2,8 @@ import { Router } from "express";
 import auth from "../middlewares/auth.js";
 import prisma from "../lib/prisma.js";
 import randomHash from "../utils/randomHash.js";
-import { ContentType } from "../generated/prisma/enums.js";
-import { parseContentQuery } from "../utils/parseQuery.js";
+import { parseContentQuery } from "../utils/contentWhere.js";
+import { mapContent } from "../utils/mapContent.js";
 
 const brainRouter = Router();
 
@@ -61,7 +61,7 @@ brainRouter.post("/share", auth, async (req, res) => {
 
 brainRouter.get("/:hash", async (req, res) => {
     const hash = req.params.hash;
-    const {search, type, page, limit, skip} = parseContentQuery(req.query)
+
 
     try {
         const link = await prisma.shareLink.findUnique({
@@ -76,18 +76,7 @@ brainRouter.get("/:hash", async (req, res) => {
             });
         }
 
-        const where: any = {
-            userId: link.userId,
-            ...(search && {
-                title: {
-                    contains: search,
-                    mode: "insensitive",
-                },
-            }),
-            ...(type !== "ALL" && {
-                type: type as ContentType,
-            }),
-        };
+        const { where } = parseContentQuery(link.userId, req.query)
 
         const contents = await prisma.content.findMany({
             where,
@@ -103,23 +92,11 @@ brainRouter.get("/:hash", async (req, res) => {
             },
             orderBy: {
                 createdAt: "desc",
-            },
-            skip,
-            take: limit,
+            }
         });
 
-        const total = await prisma.content.count({ where });
-
         res.status(200).json({
-            page,
-            limit,
-            total,
-            totalPages: Math.ceil(total / limit),
-            contents: contents.map((c) => ({
-                ...c,
-                type: c.type.toLowerCase(),
-                tags: c.tags.map((t) => t.title),
-            })),
+            contents: contents.map(mapContent),
         });
     } catch (error) {
         res.status(500).json({

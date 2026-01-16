@@ -10,6 +10,11 @@ import ContentCard from "../components/ContentCard";
 import AddEditContentModal from "../components/AddEditContentModal";
 import DeleteAccountModal from "../components/DeleteAccountModal";
 import ChangePasswordModal from "../components/ChangePasswordModal";
+import { useQuery } from "@tanstack/react-query";
+import { fetchContents } from "../api/content";
+import Loader from "../components/Loader";
+import EmptyContent from "../components/EmptyContent";
+import useDebounce from "../hooks/useDebounce";
 
 const Dashboard = () => {
     const [isOpen, setIsOpen] = useState(
@@ -19,7 +24,18 @@ const Dashboard = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingContent, setEditingContent] = useState<Content | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+    const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] =
+        useState(false);
+    const [search, setSearch] =
+        useState("");
+    const debouncedValue = useDebounce(search, 300)
+
+    const { data, isPending, isError, error, refetch } = useQuery({
+        queryKey: ["contents", activeTab, debouncedValue],
+        queryFn: ({signal}) => fetchContents(signal, activeTab, debouncedValue),
+        select: (data) => data.contents,
+        staleTime: Infinity
+    });
 
     const onClose = () => setIsOpen(false);
     const onTabChange = (tab: ContentType | "all") => {
@@ -39,53 +55,7 @@ const Dashboard = () => {
         setIsModalOpen(true);
     };
 
-    const contents: Content[] = [
-        {
-            id: "fd330ff6-e692-4e50-b8ae-a8b93c7f0b45",
-            title: "How to Build a Second Brain",
-            type: "video",
-            link: "https://www.youtube.com/watch?v=YOLELVM0TAg",
-            createdAt: "2026-01-04T08:44:25.144Z",
-            updatedAt: "2026-01-04T08:44:25.144Z",
-            tags: ["productivity", "learning"],
-        },
-        {
-            id: "e9598bc5-7e9a-4c10-acb6-87d652cd2dc5",
-            title: "Interesting Thread on AI",
-            type: "tweet",
-            link: "https://twitter.com/example/status/123456789",
-            createdAt: "2026-01-04T08:46:24.351Z",
-            updatedAt: "2026-01-04T08:46:24.351Z",
-            tags: ["ai", "tech", "tweet"],
-        },
-        {
-            id: "f7413ca4-6989-4df5-bbe6-e562d92c55f5",
-            title: "React Documentation",
-            type: "link",
-            link: "https://react.dev",
-            createdAt: "2026-01-04T09:00:05.185Z",
-            updatedAt: "2026-01-04T09:00:05.185Z",
-            tags: ["react", "documentation", "frontend"],
-        },
-        {
-            id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-            title: "CSS Grid Tutorial",
-            type: "video",
-            link: "https://www.youtube.com/watch?v=example",
-            createdAt: "2026-01-03T10:30:00.000Z",
-            updatedAt: "2026-01-03T10:30:00.000Z",
-            tags: ["css", "tutorial", "react", "documentation", "frontend"],
-        },
-        {
-            id: "b2c3d4e5-f6a7-8901-bcde-f23456789012",
-            title: "TypeScript Best Practices",
-            type: "link",
-            link: "https://typescript-best-practices.com",
-            createdAt: "2026-01-02T14:20:00.000Z",
-            updatedAt: "2026-01-02T14:20:00.000Z",
-            tags: ["typescript", "best-practices"],
-        },
-    ];
+    const contents: Content[] = data ?? []
 
     return (
         <div className="flex min-h-screen bg-background">
@@ -101,7 +71,11 @@ const Dashboard = () => {
                     isOpen && "md:ml-72"
                 )}
             >
-                <Appbar setIsOpen={setIsOpen} setIsDeleteModalOpen={setIsDeleteModalOpen} setIsChangePasswordModalOpen={setIsChangePasswordModalOpen}/>
+                <Appbar
+                    setIsOpen={setIsOpen}
+                    setIsDeleteModalOpen={setIsDeleteModalOpen}
+                    setIsChangePasswordModalOpen={setIsChangePasswordModalOpen}
+                />
                 <main className="flex-1 p-4 sm:p-6">
                     <div className="flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between mb-6">
                         <div className="flex flex-col gap-0.5">
@@ -122,31 +96,70 @@ const Dashboard = () => {
                                     type="search"
                                     placeholder="Search by title..."
                                     className="pl-9"
+                                    onChange={(e) => setSearch(e.target.value)}
                                 />
                             </div>
-                            <Button className="flex-1 sm:flex-none" onClick={handleAddNew}>
+                            <Button
+                                className="flex-1 sm:flex-none"
+                                onClick={handleAddNew}
+                            >
                                 <Plus className="size-5" />
                                 <p className="hidden sm:block">Add Content</p>
                             </Button>
                         </div>
                     </div>
                     <div
-                        className={cn(
-                            "grid gap-4 sm:grid-cols-2 md:grid-cols-3",
-                            !isOpen && "sm:grid-cols-3 md:grid-cols-4"
-                        )}
+                        className={
+                            isPending || isError || contents.length === 0
+                                ? "min-h-96 flex items-center justify-center"
+                                : cn(
+                                      "grid gap-4 sm:grid-cols-2 md:grid-cols-3",
+                                      !isOpen && "sm:grid-cols-3 md:grid-cols-4"
+                                  )
+                        }
                     >
-                        {contents.map((content) => (
-                            <ContentCard key={content.id} content={content} handleEdit={handleEdit} />
-                        ))}
+                        {isPending ? (
+                            <Loader />
+                        ) : isError ? (
+                            <div className="flex flex-col items-center gap-3 text-center">
+                                <p className="text-destructive text-sm">
+                                    {(error as Error).message ||
+                                        "Failed to load contents"}
+                                </p>
+
+                                <Button
+                                    variant="outline"
+                                    onClick={() => refetch()}
+                                    disabled={isPending}
+                                >
+                                    Retry
+                                </Button>
+                            </div>
+                        ) : contents.length === 0 ? (
+                            <EmptyContent onAddClick={handleAddNew} />
+                        ) : (
+                            contents.map((content) => (
+                                <ContentCard
+                                    key={content.id}
+                                    content={content}
+                                    handleEdit={handleEdit}
+                                />
+                            ))
+                        )}
                     </div>
                     <AddEditContentModal
                         open={isModalOpen}
                         setIsModalOpen={setIsModalOpen}
                         content={editingContent}
                     />
-                    <DeleteAccountModal open={isDeleteModalOpen} setOpen={setIsDeleteModalOpen}/>
-                    <ChangePasswordModal open={isChangePasswordModalOpen} setOpen={setIsChangePasswordModalOpen}/>
+                    <DeleteAccountModal
+                        open={isDeleteModalOpen}
+                        setOpen={setIsDeleteModalOpen}
+                    />
+                    <ChangePasswordModal
+                        open={isChangePasswordModalOpen}
+                        setOpen={setIsChangePasswordModalOpen}
+                    />
                 </main>
             </div>
         </div>

@@ -6,6 +6,9 @@ import { formatDistanceToNow } from "date-fns";
 import type { Content } from "../schemas/content.schema";
 import { useState } from "react";
 import Modal from "./ui/Modal";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteContent } from "../api/content";
+import { toast } from "sonner";
 
 interface ContentCardProps {
     content: Content;
@@ -25,6 +28,18 @@ const typeColors = {
 };
 
 const ContentCard = ({ content, handleEdit }: ContentCardProps) => {
+    const queryClient = useQueryClient();
+    const {mutate} = useMutation({
+        mutationFn: deleteContent,
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ["contents"]})
+            toast.success("Content deleted successfully.")
+            setIsModalOpen(false)
+        },
+        onError: (error) => {
+            toast.error(`${error.message}.`)
+        }
+    })
     const Icon = typeIcons[content.type];
     const [isModalOpen, setIsModalOpen] = useState(false);
     return (
@@ -62,7 +77,7 @@ const ContentCard = ({ content, handleEdit }: ContentCardProps) => {
                             </div>
                             <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
                                 <Button variant={"outline"} onClick={() => setIsModalOpen(false)}>Cancel</Button>
-                                <Button variant={"destructive"}>Delete</Button>
+                                <Button variant={"destructive"} onClick={() => mutate(content.id)}>Delete</Button>
                             </div>
                         </div>
                     </Modal>

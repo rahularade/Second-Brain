@@ -30,3 +30,8 @@ export const updateContent = async ({
     const res = await api.put(`/content/${contentId}`, data);
     return res.data;
 };
+
+export const deleteContent = async (contentId: string) => {
+    const res = await api.delete(`/content/${contentId}`);
+    return res.data;
+};

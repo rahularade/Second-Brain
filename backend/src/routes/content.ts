@@ -61,7 +61,7 @@ contentRouter.post("/", auth, async (req, res) => {
             });
         } else {
             res.status(500).json({
-                message: "Failed to create content. Try again later.",
+                message: "Failed to create content. Try again later",
             });
         }
     }
@@ -95,7 +95,7 @@ contentRouter.get("/", auth, async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({
-            message: "Failed to fetch content. Try again later.",
+            message: "Failed to fetch content. Try again later",
         });
     }
 });
@@ -170,9 +170,15 @@ contentRouter.put("/:contentId", auth, async (req, res) => {
             message: "Content updated successfully",
         });
     } catch (error: any) {
-        res.status(500).json({
-            message: "Failed to update content. Try again later.",
-        });
+        if (error.code === "P2002") {
+            res.status(409).json({
+                message: "Content already exists with this link",
+            });
+        } else {
+            res.status(500).json({
+                message: "Failed to update content. Try again later",
+            });
+        }
     }
 });
 
@@ -206,7 +212,7 @@ contentRouter.delete("/:contentId", auth, async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({
-            message: "Failed to delete content. Try again later.",
+            message: "Failed to delete content. Try again later",
         });
     }
 });

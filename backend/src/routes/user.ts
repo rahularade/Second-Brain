@@ -53,7 +53,7 @@ userRouter.post("/signup", async (req, res) => {
             });
         } else {
             res.status(500).json({
-                message: "Sign up failed. Try again later.",
+                message: "Sign up failed. Try again later",
             });
         }
     }
@@ -100,7 +100,7 @@ userRouter.post("/signin", async (req, res) => {
         });
     } catch (error: any) {
         res.status(500).json({
-            message: "Sign in failed. Try again later.",
+            message: "Sign in failed. Try again later",
         });
     }
 });
@@ -124,7 +124,7 @@ userRouter.post("/change-password", auth, async (req, res) => {
 
     if (oldPassword.toLowerCase() === newPassword.toLowerCase()) {
         return res.status(400).json({
-            message: "New password must be different from the old password.",
+            message: "New password must be different from the old password",
         });
     }
 
@@ -169,7 +169,7 @@ userRouter.post("/change-password", auth, async (req, res) => {
         });
     } catch (error: any) {
         res.status(500).json({
-            message: "Failed to change password. Try again later.",
+            message: "Failed to change password. Try again later",
         });
     }
 });
@@ -196,7 +196,7 @@ userRouter.get("/me", auth, async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({
-            message: "Failed to fetch user. Try again later.",
+            message: "Failed to fetch user. Try again later",
         });
     }
 });
@@ -220,7 +220,7 @@ userRouter.delete("/me", auth, async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({
-            message: "Failed to delete account. Try again later.",
+            message: "Failed to delete account. Try again later",
         });
     }
 });

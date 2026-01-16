@@ -33,7 +33,7 @@ brainRouter.post("/share", auth, async (req, res) => {
             res.status(200).json({ hash });
         } catch (error) {
             res.status(500).json({
-                message: "Failed to create sharelink. Try again later.",
+                message: "Failed to create sharelink. Try again later",
             });
         }
     } else {
@@ -53,7 +53,7 @@ brainRouter.post("/share", auth, async (req, res) => {
             });
         } catch (error) {
             res.status(500).json({
-                message: "Failed to delete sharelink. Try again later.",
+                message: "Failed to delete sharelink. Try again later",
             });
         }
     }
@@ -72,7 +72,7 @@ brainRouter.get("/:hash", async (req, res) => {
 
         if (!link) {
             return res.status(404).json({
-                message: "Share link is invalid or expired.",
+                message: "Share link is invalid or expired",
             });
         }
 
@@ -100,7 +100,7 @@ brainRouter.get("/:hash", async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({
-            message: "Failed to fetch content. Try again later.",
+            message: "Failed to fetch content. Try again later",
         });
     }
 });

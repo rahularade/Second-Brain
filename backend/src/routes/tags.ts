@@ -6,16 +6,8 @@ const tagRouter = Router();
 
 tagRouter.get("/", auth, async (req, res) => {
     try {
-        const filter = typeof req.query.filter === "string" ? req.query.filter.trim() : "";
         const tags = await prisma.tag.findMany({
-            where: {
-                title: {
-                    contains: filter,
-                    mode: "insensitive",
-                },
-            },
             select: {
-                id: true,
                 title: true,
             },
             orderBy: {
@@ -26,7 +18,7 @@ tagRouter.get("/", auth, async (req, res) => {
         res.status(200).json({ tags });
     } catch (error) {
         res.status(500).json({
-            message: "Failed to fetch tags. Try again later.",
+            message: "Failed to fetch tags. Try again later",
         });
     }
 });

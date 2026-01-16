@@ -9,9 +9,12 @@ import Modal from "./ui/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Label from "./ui/Label";
 import Input from "./ui/Input";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import TypeField from "./TypeField";
 import TagsField from "./TagsField";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addContent, updateContent } from "../api/content";
+import { toast } from "sonner";
 
 interface AddEditContentModalProps {
     open: boolean;
@@ -24,40 +27,63 @@ const AddEditContentModal = ({
     setIsModalOpen,
     content,
 }: AddEditContentModalProps) => {
+    const queryClient = useQueryClient();
+    const emptyValues = useMemo<ContentInput>(
+        () => ({
+            title: "",
+            link: "",
+            type: null,
+            tags: [],
+        }),
+        []
+    );
+
     const {
         register,
         handleSubmit,
         control,
         reset,
-        formState: { errors, isSubmitting },
+        formState: { errors },
     } = useForm<ContentInput>({
         resolver: zodResolver(contentSchema),
         mode: "onChange",
-        defaultValues: {
-            title: "",
-            link: "",
-            type: null,
-            tags: [],
+        defaultValues: emptyValues,
+    });
+
+    useEffect(() => {
+        reset(
+            content
+                ? {
+                      title: content.title,
+                      link: content.link,
+                      type: content.type,
+                      tags: content.tags,
+                  }
+                : emptyValues
+        );
+    }, [content, open, reset]);
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: content ? updateContent : addContent,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["contents"] });
+            toast.success(
+                content
+                    ? "Content updated successfully."
+                    : "Content added successfully."
+            );
+            setIsModalOpen(false);
+        },
+        onError: (error) => {
+            toast.error(`${error.message}.`);
         },
     });
 
     useEffect(() => {
-        if (content) {
-            reset({
-                title: content.title,
-                link: content.link,
-                type: content.type,
-                tags: content.tags,
-            });
-        } else {
-            reset({
-                title: "",
-                link: "",
-                type: null,
-                tags: [],
-            });
+        if (open) {
+            queryClient.invalidateQueries({ queryKey: ["tags"] });
         }
-    }, [content, open, reset]);
+    }, [open]);
 
     const onClose = () => {
         setIsModalOpen(false);
@@ -65,8 +91,11 @@ const AddEditContentModal = ({
     };
 
     const onSubmit = async (data: ContentInput) => {
-        await new Promise(res => setTimeout(res, 2000))
-        console.log(data);
+        if (content) {
+            mutate({ contentId: content.id, data });
+        } else {
+            mutate({ data });
+        }
     };
 
     return (
@@ -120,7 +149,7 @@ const AddEditContentModal = ({
                             <Label htmlFor="type" error={errors.type?.message}>
                                 Type
                             </Label>
-                            <TypeField control={control} name="type"/>
+                            <TypeField control={control} name="type" />
                             {errors.type && (
                                 <p className="text-destructive text-sm">
                                     {errors.type?.message}
@@ -131,10 +160,7 @@ const AddEditContentModal = ({
                             <Label htmlFor="tags" error={errors.tags?.message}>
                                 Tags
                             </Label>
-                            <TagsField
-                                control={control}
-                                name="tags"
-                            />
+                            <TagsField control={control} name="tags" />
                             {errors.tags && (
                                 <p className="text-destructive text-sm">
                                     {errors.tags?.message}
@@ -150,8 +176,8 @@ const AddEditContentModal = ({
                         >
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting
+                        <Button type="submit" disabled={isPending}>
+                            {isPending
                                 ? "Saving..."
                                 : content
                                 ? "Update"

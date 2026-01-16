@@ -4,17 +4,19 @@ import CreatableSelect from "react-select/creatable";
 import { ChevronDown, X } from "lucide-react";
 import type { ClassNamesConfig } from "react-select";
 import { cn } from "../lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { fetchTags } from "../api/tags";
 
 type TagsFieldProps = UseControllerProps<ContentInput, "tags">;
 
 const TagsField = (props: TagsFieldProps) => {
     const { field, fieldState } = useController(props);
 
-    const options = [
-        { value: "tweet", label: "Tweet" },
-        { value: "video", label: "Video" },
-        { value: "link", label: "Link" },
-    ];
+    const {data, isPending} = useQuery({
+        queryKey: ["tags"],
+        queryFn: fetchTags,
+        select: data => data.tags
+    })
 
     const CreatableStyles: ClassNamesConfig = {
         control: ({ isFocused, isDisabled }) =>
@@ -57,7 +59,11 @@ const TagsField = (props: TagsFieldProps) => {
                 label: v,
                 value: v,
             }))}
-            options={options}
+            isLoading={isPending}
+            options={data?.map((tag:any) => ({
+                label: tag.title,
+                value: tag.title,
+            }))}
             onChange={(options) => {
                 field.onChange(options.map((tag: any) => tag.value));
             }}

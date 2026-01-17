@@ -31,6 +31,7 @@ const Signup = () => {
         mutationFn: signup,
         onSuccess: async () => {
             await queryClient.invalidateQueries({queryKey: ["user"]})
+            await queryClient.invalidateQueries({queryKey: ["contents"]})
             toast.success("Account created successfully.")
         },
         onError: (error) => {
@@ -117,7 +118,7 @@ const Signup = () => {
                         </div>
                     </div>
                     <div className="flex flex-col gap-4 p-6 pt-0">
-                        <Button type="submit" className="w-full">
+                        <Button type="submit" className="w-full" disabled={isPending}>
                             {isPending ? "Create account..." : "Create Account"}
                         </Button>
                         <p className="text-sm text-muted-foreground text-center">

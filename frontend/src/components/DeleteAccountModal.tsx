@@ -16,7 +16,8 @@ const DeleteAccountModal = ({ open, setOpen }: DeleteAccountModalProps) => {
     const queryClient = useQueryClient();
     const { mutate, isPending } = useMutation({
         mutationFn: deleteAccount,
-        onSuccess: () => {
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({queryKey: ["user"]})
             queryClient.clear();
             toast.success("Account deleted successfully.");
             navigate("/", { replace: true });

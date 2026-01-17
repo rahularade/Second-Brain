@@ -22,13 +22,14 @@ const DropdownMenu = ({
 }: SharePopoverProps) => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const {user} = useAuth()
+    const { user } = useAuth();
     const { mutate, isPending } = useMutation({
         mutationFn: signout,
-        onSuccess: () => {
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({queryKey: ["user"]})
             queryClient.clear();
             toast.success("Signed out successfully.");
-            navigate("/", { replace: true });
+            navigate("/signin", {replace: true})
         },
         onError: (error) => {
             toast.error(`${error.message}.`);

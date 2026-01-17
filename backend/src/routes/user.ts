@@ -82,7 +82,7 @@ userRouter.post("/signin", async (req, res) => {
         });
 
         if (!user) {
-            return res.status(401).json({
+            return res.status(400).json({
                 message: "Invalid username or password",
             });
         }
@@ -90,7 +90,7 @@ userRouter.post("/signin", async (req, res) => {
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordMatch) {
-            return res.status(401).json({
+            return res.status(400).json({
                 message: "Invalid username or password",
             });
         }

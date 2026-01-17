@@ -123,8 +123,8 @@ const Dashboard = () => {
                         ) : isError ? (
                             <div className="flex flex-col items-center gap-3 text-center">
                                 <p className="text-destructive text-sm">
-                                    {(error as Error).message ||
-                                        "Failed to load contents"}
+                                    {error.message ? `${error.message}.` :
+                                        "Failed to load contents."}
                                 </p>
 
                                 <Button

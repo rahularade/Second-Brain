@@ -30,6 +30,7 @@ const Signin = () => {
         mutationFn: signin,
         onSuccess: async () => {
             await queryClient.invalidateQueries({queryKey: ["user"]})
+            await queryClient.invalidateQueries({queryKey: ["contents"]})
             toast.success("Signed in successfully.")
         },
         onError: (error) => {

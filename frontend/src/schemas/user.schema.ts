@@ -43,13 +43,18 @@ export const changePasswordSchema = z
     .object({
         oldPassword: passwordSchema,
         newPassword: passwordSchema,
-        confirmPassword: z.string("Confirm password is required."),
+        confirmPassword: z.string().min(8, {
+            error: (password) =>
+                !password.input
+                    ? "Confirm password is required."
+                    : "Must be at least 8 characters.",
+        }),
     })
     .superRefine((data, ctx) => {
         if (data.newPassword !== data.confirmPassword) {
             ctx.addIssue({
                 path: ["confirmPassword"],
-                message: "",
+                message: "Confirm password does not match.",
                 code: "custom",
             });
         }

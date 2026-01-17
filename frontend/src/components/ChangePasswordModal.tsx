@@ -3,9 +3,15 @@ import Modal from "./ui/Modal";
 import Button from "./ui/Button";
 import Label from "./ui/Label";
 import { useForm } from "react-hook-form";
-import { changePasswordSchema, type ChangePasswordInput } from "../schemas/user.schema";
+import {
+    changePasswordSchema,
+    type ChangePasswordInput,
+} from "../schemas/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PasswordField from "./PasswordField";
+import { useMutation } from "@tanstack/react-query";
+import { changePassword } from "../api/auth";
+import { toast } from "sonner";
 
 interface ChangePasswordModalProps {
     open: boolean;
@@ -13,12 +19,39 @@ interface ChangePasswordModalProps {
 }
 
 const ChangePasswordModal = ({ open, setOpen }: ChangePasswordModalProps) => {
-    const { control, handleSubmit, formState: {errors} } = useForm<ChangePasswordInput>({
-        resolver: zodResolver(changePasswordSchema)
-    })
+    const {
+        control,
+        handleSubmit,
+        reset,
+        formState: { errors },
+    } = useForm<ChangePasswordInput>({
+        resolver: zodResolver(changePasswordSchema),
+        mode: "onChange",
+        defaultValues: {
+            oldPassword: "",
+            newPassword: "",
+            confirmPassword: "",
+        },
+    });
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: changePassword,
+        onSuccess: () => {
+            toast.success("Password changed successfully.");
+            onClose();
+        },
+        onError: (error) => {
+            toast.error(`${error.message}.`);
+        },
+    });
+
+    const onClose = () => {
+        setOpen(false);
+        reset();
+    };
 
     const onSubmit = (data: ChangePasswordInput) => {
-            console.log(data);
+        mutate(data);
     };
 
     return (
@@ -36,7 +69,11 @@ const ChangePasswordModal = ({ open, setOpen }: ChangePasswordModalProps) => {
                             >
                                 Old Password
                             </Label>
-                            <PasswordField id="oldPassword" control={control} name="oldPassword"/>
+                            <PasswordField
+                                id="oldPassword"
+                                control={control}
+                                name="oldPassword"
+                            />
                             {errors.oldPassword && (
                                 <p className="text-destructive text-sm">
                                     {errors.oldPassword?.message}
@@ -48,9 +85,13 @@ const ChangePasswordModal = ({ open, setOpen }: ChangePasswordModalProps) => {
                                 htmlFor="newPassword"
                                 error={errors.newPassword?.message}
                             >
-                                Old Password
+                                New Password
                             </Label>
-                            <PasswordField id="newPassword" control={control} name="newPassword"/>
+                            <PasswordField
+                                id="newPassword"
+                                control={control}
+                                name="newPassword"
+                            />
                             {errors.newPassword && (
                                 <p className="text-destructive text-sm">
                                     {errors.newPassword?.message}
@@ -62,9 +103,13 @@ const ChangePasswordModal = ({ open, setOpen }: ChangePasswordModalProps) => {
                                 htmlFor="confirmPassword"
                                 error={errors.confirmPassword?.message}
                             >
-                                Old Password
+                                Confirm Password
                             </Label>
-                            <PasswordField id="confirmPassword" control={control} name="confirmPassword"/>
+                            <PasswordField
+                                id="confirmPassword"
+                                control={control}
+                                name="confirmPassword"
+                            />
                             {errors.confirmPassword && (
                                 <p className="text-destructive text-sm">
                                     {errors.confirmPassword?.message}
@@ -76,11 +121,13 @@ const ChangePasswordModal = ({ open, setOpen }: ChangePasswordModalProps) => {
                         <Button
                             type="button"
                             variant={"outline"}
-                            onClick={() => setOpen(false)}
+                            onClick={onClose}
                         >
                             Cancel
                         </Button>
-                        <Button type="submit">Change Password</Button>
+                        <Button type="submit" disabled={isPending}>
+                            {isPending ? "Changing..." : "Change Password"}
+                        </Button>
                     </div>
                 </form>
             </div>

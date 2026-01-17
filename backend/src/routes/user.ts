@@ -4,7 +4,11 @@ import prisma from "../lib/prisma.js";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config.js";
 import auth from "../middlewares/auth.js";
-import { changePasswordSchema, userSigninSchema, userSignupSchema, } from "../schemas/user.schema.js";
+import {
+    changePasswordSchema,
+    userSigninSchema,
+    userSignupSchema,
+} from "../schemas/user.schema.js";
 
 const userRouter = Router();
 
@@ -14,7 +18,7 @@ const options: CookieOptions = {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000
+    maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
 userRouter.post("/signup", async (req, res) => {
@@ -122,12 +126,6 @@ userRouter.post("/change-password", auth, async (req, res) => {
 
     const { oldPassword, newPassword } = parsedData.data;
 
-    if (oldPassword.toLowerCase() === newPassword.toLowerCase()) {
-        return res.status(400).json({
-            message: "New password must be different from the old password",
-        });
-    }
-
     try {
         const user = await prisma.user.findUnique({
             where: {
@@ -144,8 +142,14 @@ userRouter.post("/change-password", auth, async (req, res) => {
         const passwordMatch = await bcrypt.compare(oldPassword, user.password);
 
         if (!passwordMatch) {
-            return res.status(401).json({
+            return res.status(400).json({
                 message: "Invalid old password",
+            });
+        }
+
+        if (oldPassword.toLowerCase() === newPassword.toLowerCase()) {
+            return res.status(400).json({
+                message: "New password must be different from the old password",
             });
         }
 
@@ -216,7 +220,7 @@ userRouter.delete("/me", auth, async (req, res) => {
         }
 
         res.status(200).clearCookie("token", options).json({
-            message: "User account deleted successfully"
+            message: "User account deleted successfully",
         });
     } catch (error) {
         res.status(500).json({

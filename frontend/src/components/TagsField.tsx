@@ -15,7 +15,8 @@ const TagsField = (props: TagsFieldProps) => {
     const {data, isPending} = useQuery({
         queryKey: ["tags"],
         queryFn: fetchTags,
-        select: data => data.tags
+        select: data => data.tags,
+        staleTime: Infinity
     })
 
     const CreatableStyles: ClassNamesConfig = {

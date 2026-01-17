@@ -5,6 +5,7 @@ import DropdownMenu from "./DropdownMenu";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "../lib/utils";
 import SharePopover from "./SharePopover";
+import { useAuth } from "../context/AuthContext";
 
 interface AppbarProps {
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,6 +31,7 @@ const Appbar = ({ setIsOpen, setIsDeleteModalOpen, setIsChangePasswordModalOpen 
     }, []);
 
     const onClose = () => setActivePopover(null)
+    const {user} = useAuth();
 
     return (
         <header className="sticky top-0 z-10 flex h-14 w-full items-center justify-between gap-4 border-b bg-background/95 backdrop-blur px-2 sm:px-4">
@@ -72,7 +74,7 @@ const Appbar = ({ setIsOpen, setIsDeleteModalOpen, setIsChangePasswordModalOpen 
                     }
                 >
                     <User className="h-4 w-4" />
-                    <span className="hidden sm:inline">John Doe</span>
+                    <span className="hidden sm:inline">{user?.name}</span>
                 </Button>
                 <DropdownMenu open={activePopover === "profile"} onClose={onClose} onDelete={() => setIsDeleteModalOpen(true)} onChangePassword={() => setIsChangePasswordModalOpen(true)}/>
                 <SharePopover open={activePopover === "share"} onClose={onClose}/>

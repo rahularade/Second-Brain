@@ -2,9 +2,11 @@ import { Brain } from "lucide-react";
 import { Link } from "react-router-dom";
 import Button from "../ui/Button";
 import ThemeToggler from "../ThemeToggler";
+import { useAuth } from "../../context/AuthContext";
 
 
 const Navbar = () => {
+  const {user} = useAuth();
   return <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
     <div className="container flex h-16 items-center justify-between mx-auto">
         <div className="flex items-center gap-2">
@@ -13,9 +15,9 @@ const Navbar = () => {
         </div>
         <div className="flex items-center gap-4">
           <ThemeToggler />
-          <Button variant={"ghost"}>
+          {!user && <Button variant={"ghost"}>
             <Link to={"/signin"}>Sign In</Link>
-          </Button>
+          </Button>}
           <Button>
             <Link to={"/dashboard"}>Get Started</Link>
           </Button>

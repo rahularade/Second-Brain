@@ -1,5 +1,5 @@
 import { Brain } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import { useForm } from "react-hook-form";
@@ -7,12 +7,11 @@ import { userSigninSchema, type UserSigninInput } from "../schemas/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Label from "../components/ui/Label";
 import PasswordField from "../components/PasswordField";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { signin } from "../api/auth";
 import { toast } from "sonner";
 
 const Signin = () => {
-    const navigate = useNavigate();
     const {
         register,
         control,
@@ -26,11 +25,12 @@ const Signin = () => {
         }
     });
 
+    const queryClient = useQueryClient();
     const { mutate, isPending } = useMutation({
         mutationFn: signin,
-        onSuccess: () => {
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({queryKey: ["user"]})
             toast.success("Signed in successfully.")
-            navigate("/dashboard");
         },
         onError: (error) => {
             toast.error(`${error.message}.`)

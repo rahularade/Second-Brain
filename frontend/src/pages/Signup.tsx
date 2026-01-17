@@ -1,5 +1,5 @@
 import { Brain } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import Label from "../components/ui/Label";
@@ -7,12 +7,11 @@ import { useForm } from "react-hook-form";
 import { userSignupSchema, type UserSignupInput } from "../schemas/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PasswordField from "../components/PasswordField";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { signup } from "../api/auth";
 import { toast } from "sonner";
 
 const Signup = () => {
-    const navigate = useNavigate()
     const {
         register,
         control,
@@ -27,11 +26,12 @@ const Signup = () => {
         }
     });
 
+    const queryClient = useQueryClient();
     const { mutate, isPending } = useMutation({
         mutationFn: signup,
-        onSuccess: () => {
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({queryKey: ["user"]})
             toast.success("Account created successfully.")
-            navigate("/dashboard");
         },
         onError: (error) => {
             toast.error(`${error.message}.`)

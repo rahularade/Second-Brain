@@ -4,8 +4,14 @@ import Navbar from "../components/landing/Navbar";
 import FeatureCard from "../components/landing/FeatureCard";
 import { Link } from "react-router-dom";
 import Button from "../components/ui/Button";
+import { useAuth } from "../context/AuthContext";
+import Loader from "../components/Loader";
 
 const Landing = () => {
+    const {isLoading} = useAuth();
+    if (isLoading) return <div className="h-screen w-full flex items-center justify-center">
+        <Loader />
+    </div>;
     return (
         <div className="min-h-screen bg-background">
             <Navbar />

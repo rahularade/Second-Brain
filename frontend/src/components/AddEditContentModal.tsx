@@ -63,6 +63,11 @@ const AddEditContentModal = ({
         );
     }, [content, open, reset]);
 
+    const onClose = () => {
+        setIsModalOpen(false);
+        reset();
+    };
+
     const { mutate, isPending } = useMutation({
         mutationFn: content ? updateContent : addContent,
         onSuccess: () => {
@@ -72,7 +77,7 @@ const AddEditContentModal = ({
                     ? "Content updated successfully."
                     : "Content added successfully."
             );
-            setIsModalOpen(false);
+            onClose();
         },
         onError: (error) => {
             toast.error(`${error.message}.`);
@@ -83,12 +88,7 @@ const AddEditContentModal = ({
         if (open) {
             queryClient.invalidateQueries({ queryKey: ["tags"] });
         }
-    }, [open]);
-
-    const onClose = () => {
-        setIsModalOpen(false);
-        reset();
-    };
+    }, [open, queryClient]);
 
     const onSubmit = async (data: ContentInput) => {
         if (content) {
@@ -180,8 +180,8 @@ const AddEditContentModal = ({
                             {isPending
                                 ? "Saving..."
                                 : content
-                                ? "Update"
-                                : "Add"}
+                                  ? "Update"
+                                  : "Add"}
                         </Button>
                     </div>
                 </form>

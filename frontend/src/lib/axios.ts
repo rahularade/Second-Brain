@@ -21,21 +21,16 @@ api.interceptors.response.use(
             return Promise.reject(new Error("Unable to connect to the server. Please try again later"));
         }
         const status = error.response?.status;
-        const currentPath = window.location.pathname;
 
         if (status === 401) {
-            const isAuthPage =
-                currentPath.startsWith("/signin") ||
-                currentPath.startsWith("/signup");
-
-            if (!isAuthPage) {
-                window.location.href = "/signin";
-            }
+            return Promise.reject(
+                new Error("Session expired. Please sign in again")
+            );
         }
 
         const message =
             error.response?.data?.message ||
-            "Something went wrong";
+            "Something went wrong. Please try again later";
 
         return Promise.reject(new Error(message));
     }

@@ -18,3 +18,13 @@ export const changePassword = async (data: ChangePasswordInput) => {
     })
     return res.data
 }
+
+export const signout = async () => {
+    const res = await api.post("/user/signout")
+    return res.data
+}
+
+export const deleteAccount = async () => {
+    const res = await api.delete("/user/me")
+    return res.data
+}

@@ -1,16 +1,37 @@
 import { KeyRound, LogOut, Trash2 } from "lucide-react";
 import Button from "./ui/Button";
 import { cn } from "../lib/utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { signout } from "../api/auth";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
-
-interface SharePopoverProps{
-    open: boolean,
-    onClose: () => void
-    onDelete: () => void
-    onChangePassword: () => void
+interface SharePopoverProps {
+    open: boolean;
+    onClose: () => void;
+    onDelete: () => void;
+    onChangePassword: () => void;
 }
 
-const DropdownMenu = ({ open, onClose, onDelete, onChangePassword }: SharePopoverProps) => {
+const DropdownMenu = ({
+    open,
+    onClose,
+    onDelete,
+    onChangePassword,
+}: SharePopoverProps) => {
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const { mutate, isPending } = useMutation({
+        mutationFn: signout,
+        onSuccess: () => {
+            queryClient.clear();
+            toast.success("Signed out successfully.");
+            navigate("/", { replace: true });
+        },
+        onError: (error) => {
+            toast.error(`${error.message}.`);
+        },
+    });
     const handleDelete = () => {
         onDelete();
         onClose();
@@ -44,6 +65,8 @@ const DropdownMenu = ({ open, onClose, onDelete, onChangePassword }: SharePopove
                 variant={"ghost"}
                 size={"sm"}
                 className="justify-baseline px-2 py-1.5 w-full"
+                onClick={() => mutate()}
+                disabled={isPending}
             >
                 <LogOut className="mr-2 h-4 w-4" />
                 Sign Out

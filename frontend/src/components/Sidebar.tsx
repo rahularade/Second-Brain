@@ -28,7 +28,6 @@ const Sidebar = ({ activeTab, onTabChange, isOpen, onClose }: SidebarProps) => {
                 />
             )}
             <aside
-                // ref={ref}
                 className={cn(
                     "fixed left-0 top-0 h-screen w-72 z-50 border-r bg-sidebar-background transition-transform duration-300",
                     isOpen ? "translate-x-0" : "-translate-x-full"
@@ -42,7 +41,7 @@ const Sidebar = ({ activeTab, onTabChange, isOpen, onClose }: SidebarProps) => {
                     <Button
                         variant={"ghost"}
                         size={"icon"}
-                        className="size-8 md:hidden"
+                        className="md:hidden"
                         onClick={onClose}
                     >
                         <X className="size-5" />

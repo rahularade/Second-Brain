@@ -15,7 +15,7 @@ const Landing = () => {
     return (
         <div className="min-h-screen bg-background">
             <Navbar />
-            <section className="container py-24 md:py-32 mx-auto">
+            <section className="w-11/12 sm:container py-24 md:py-32 mx-auto">
                 <div className="flex flex-col items-center text-center gap-8">
                     <div className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm">
                         <Sparkles className="h-4 w-4 text-primary" />
@@ -40,7 +40,7 @@ const Landing = () => {
                     </div>
                 </div>
             </section>
-            <section className="container py-24 border-t mx-auto">
+            <section className="w-11/12 sm:container py-24 border-t mx-auto">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">
                         Everything you need to stay organized
@@ -67,7 +67,7 @@ const Landing = () => {
                     />
                 </div>
             </section>
-            <section className="container py-24 border-t mx-auto">
+            <section className="w-11/12 sm:container py-24 border-t mx-auto">
                 <div className="flex flex-col items-center text-center gap-6 p-12 rounded-2xl bg-primary/5 border">
                     <h2 className="text-3xl md:text-4xl font-bold">
                         Ready to build your Second Brain?

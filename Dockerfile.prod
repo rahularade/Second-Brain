@@ -1,0 +1,15 @@
+FROM node:24-alpine
+ARG DATABASE_URL
+
+WORKDIR /app
+
+COPY ./backend/package* ./
+
+RUN npm ci
+
+COPY ./backend ./
+
+RUN DATABASE_URL=$DATABASE_URL npx prisma generate
+RUN npm run build
+
+CMD [ "npm", "run", "start" ]

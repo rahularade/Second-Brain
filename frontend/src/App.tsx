@@ -8,6 +8,8 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "./context/AuthContext";
 import { PublicRoute } from "./routes/PublicRoute";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
+import PublicDashboard from "./pages/PublicDashboard";
+import NotFound from "./pages/NotFound";
 
 function App() {
     return (
@@ -39,6 +41,14 @@ function App() {
                                     <Dashboard />
                                 </ProtectedRoute>
                             }
+                        />
+                        <Route
+                            path="/brain/:shareLink"
+                            element={ <PublicDashboard /> }
+                        />
+                        <Route
+                            path="*"
+                            element={ <NotFound /> }
                         />
                     </Routes>
                 </AuthProvider>

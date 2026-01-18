@@ -35,3 +35,16 @@ export const deleteContent = async (contentId: string) => {
     const res = await api.delete(`/content/${contentId}`);
     return res.data;
 };
+
+export const fetchBrainContents = async (
+    signal: AbortSignal,
+    type: string,
+    search: string,
+    shareLink: string
+) => {
+    const res = await api.get(`/brain/${shareLink}`, {
+        signal,
+        params: { type, search },
+    });
+    return res.data;
+};

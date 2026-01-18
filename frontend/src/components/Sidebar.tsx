@@ -2,6 +2,7 @@ import { Brain, LayoutGrid, Link2, Twitter, Video, X } from "lucide-react";
 import { cn } from "../lib/utils";
 import Button from "./ui/Button";
 import type { ContentType } from "../schemas/content.schema";
+import { Link } from "react-router-dom";
 
 interface SidebarProps {
     activeTab: ContentType | "all";
@@ -34,10 +35,10 @@ const Sidebar = ({ activeTab, onTabChange, isOpen, onClose }: SidebarProps) => {
                 )}
             >
                 <div className="flex items-center justify-between px-4 border-b h-14">
-                    <div className="flex items-center gap-2">
+                    <Link to={"/"} className="flex items-center gap-2">
                         <Brain className="size-6 text-primary" />
                         <span className="font-semibold">Second Brain</span>
-                    </div>
+                    </Link>
                     <Button
                         variant={"ghost"}
                         size={"icon"}

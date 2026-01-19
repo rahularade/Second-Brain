@@ -1,4 +1,4 @@
-import { Brain, Menu, X } from "lucide-react";
+import { Brain, Github, Linkedin, Menu, User, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import Button from "../ui/Button";
 import ThemeToggler from "../ThemeToggler";
@@ -19,27 +19,51 @@ const Navbar = () => {
                         <Brain className="h-8 w-8 text-primary" />
                         <span className="text-xl font-bold">Second Brain</span>
                     </div>
-                        <div className="hidden sm:flex items-center gap-4">
-                            <ThemeToggler />
-                            {!user && (
-                                <Link to={"/signin"}>
-                                    <Button variant={"ghost"}>Sign In</Button>
-                                </Link>
-                            )}
-                            <Link to={"/dashboard"}>
-                                <Button>Get Started</Button>
-                            </Link>
-                        </div>
-                        <div className="flex sm:hidden items-center gap-4">
-                            <ThemeToggler />
-                            <Button
-                                variant={"ghost"}
-                                onClick={() => setIsOpen(true)}
-                                className="p-0"
-                            >
-                                <Menu className="size-5 rotate-0 scale-100 transition-all" />
+                    <div className="hidden sm:flex items-center gap-4">
+                        <a
+                            href="https://rahularade.site"
+                            target="_blank"
+                        >
+                            <Button variant={"ghost"} size={"icon"}>
+                                <User className="size-4" />
                             </Button>
-                        </div>
+                        </a>
+                        <a
+                            href="https://github.com/rahularade/Second-Brain"
+                            target="_blank"
+                        >
+                            <Button variant={"ghost"} size={"icon"}>
+                                <Github className="size-4" />
+                            </Button>
+                        </a>
+                        <a
+                            href="https://in.linkedin.com/in/rahul-arade"
+                            target="_blank"
+                        >
+                            <Button variant={"ghost"} size={"icon"}>
+                                <Linkedin className="size-4" />
+                            </Button>
+                        </a>
+                         <ThemeToggler />
+                        {!user && (
+                            <Link to={"/signin"}>
+                                <Button variant={"ghost"}>Sign In</Button>
+                            </Link>
+                        )}
+                        <Link to={"/dashboard"}>
+                            <Button>Get Started</Button>
+                        </Link>
+                    </div>
+                    <div className="flex sm:hidden items-center gap-4">
+                        <ThemeToggler />
+                        <Button
+                            variant={"ghost"}
+                            onClick={() => setIsOpen(true)}
+                            className="p-0"
+                        >
+                            <Menu className="size-5 rotate-0 scale-100 transition-all" />
+                        </Button>
+                    </div>
                 </div>
             </header>
             {isOpen && (
@@ -62,28 +86,54 @@ const Navbar = () => {
                         <Brain className="h-8 w-8 text-primary" />
                         <span className="text-xl font-bold">Second Brain</span>
                     </Link>
-                    <Button
-                        variant={"ghost"}
-                        className="p-0"
-                        onClick={onClose}
-                    >
+                    <Button variant={"ghost"} className="p-0" onClick={onClose}>
                         <X className="size-5" />
                     </Button>
                 </div>
                 <nav className="flex flex-col gap-2 p-4">
                     {!user && (
                         <>
-                        <Link to={"/signin"}>
-                            <Button variant={"ghost"} className="w-full">Sign In</Button>
-                        </Link>
-                        <Link to={"/signup"}>
-                            <Button variant={"ghost"} className="w-full">Sign Up</Button>
-                        </Link>
+                            <Link to={"/signin"}>
+                                <Button variant={"ghost"} className="w-full">
+                                    Sign In
+                                </Button>
+                            </Link>
+                            <Link to={"/signup"}>
+                                <Button variant={"ghost"} className="w-full">
+                                    Sign Up
+                                </Button>
+                            </Link>
                         </>
                     )}
                     <Link to={"/dashboard"}>
-                        <Button  className="w-full">Get Started</Button>
+                        <Button className="w-full">Get Started</Button>
                     </Link>
+                    <div className="flex items-end justify-center gap-4">
+                        <a
+                            href="https://rahularade.site"
+                            target="_blank"
+                        >
+                            <Button variant={"ghost"} size={"icon"}>
+                                <User className="size-4" />
+                            </Button>
+                        </a>    
+                        <a
+                            href="https://github.com/rahularade/Second-Brain"
+                            target="_blank"
+                        >
+                            <Button variant={"ghost"} size={"icon"}>
+                                <Github className="size-4" />
+                            </Button>
+                        </a>
+                        <a
+                            href="https://in.linkedin.com/in/rahul-arade"
+                            target="_blank"
+                        >
+                            <Button variant={"ghost"} size={"icon"}>
+                                <Linkedin className="size-4" />
+                            </Button>
+                        </a>
+                    </div>
                 </nav>
             </div>
         </>

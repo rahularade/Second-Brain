@@ -1,7 +1,7 @@
-# 🧠 Second Brain – Personal Knowledge Management App
+# 🧠 Second Brain – Organize, search, and share your links in one place.
 
-**Second Brain** is a full-stack personal knowledge management application that helps users organize links such as tweet links, video links, or any other links in one place.
-It provides secure authentication, powerful filtering and search, content editing, and public sharing via a single shareable link, all wrapped in a clean, responsive UI with dark and light modes.
+**Second Brain** is a full-stack application that lets users save links, videos, and tweets in one place.
+It offers secure authentication, powerful filtering and search, content editing, and public sharing via a single shareable link, all within a clean, responsive UI with dark and light modes.
 
 🔗 Live Demo: https://secondbrain.rahularade.site/
 
